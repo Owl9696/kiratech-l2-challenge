@@ -14,3 +14,8 @@ replicas:
     count: 1
   - name: loadgenerator
     count: 1
+
+images:
+  - name: us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo/frontend
+    newName: kiratech-frontend
+    newTag: v1
