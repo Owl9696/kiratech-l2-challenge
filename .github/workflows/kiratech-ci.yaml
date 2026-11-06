@@ -1,0 +1,72 @@
+name: Kiratech CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'challenge/**'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kiratech-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  validate-test-build:
+    name: Validate, test and build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Check shell syntax
+        run: |
+          for script in platform/scripts/*.sh; do
+            bash -n "$script"
+          done
+
+      - name: Install kubectl with checksum verification
+        env:
+          KUBECTL_VERSION: v1.35.8
+        run: |
+          download_dir="$(mktemp -d)"
+          trap 'rm -rf "$download_dir"' EXIT
+          cd "$download_dir"
+          base_url="https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64"
+          curl -fsSL --retry 3 -o kubectl "$base_url/kubectl"
+          curl -fsSL --retry 3 -o kubectl.sha256 "$base_url/kubectl.sha256"
+          echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+          sudo install -m 0755 kubectl /usr/local/bin/kubectl
+          kubectl version --client
+
+      - name: Render dev and prod manifests
+        run: ./platform/scripts/validate.sh
+
+      - name: Build frontend test image
+        run: |
+          docker build \
+            --target builder \
+            --tag kiratech-frontend-tests:ci \
+            --file src/frontend/Dockerfile \
+            src/frontend
+
+      - name: Run frontend Go tests
+        run: |
+          docker run --rm kiratech-frontend-tests:ci \
+            go test -count=1 ./...
+
+      - name: Build frontend runtime image
+        run: ./platform/scripts/build-frontend.sh
