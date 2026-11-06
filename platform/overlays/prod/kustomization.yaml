@@ -18,4 +18,4 @@ replicas:
 images:
   - name: us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo/frontend
     newName: kiratech-frontend
-    newTag: git-e5c504b8b6ff
+    newTag: git-b13f4246ae3d
