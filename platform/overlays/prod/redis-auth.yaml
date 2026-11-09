@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-cart
+spec:
+  strategy:
+    type: Recreate
+    rollingUpdate: null
+  template:
+    spec:
+      containers:
+        - name: redis
+          args:
+            - redis-server
+            - /etc/redis-auth/redis.conf
+          env:
+            - name: REDISCLI_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: redis-auth
+                  key: password
+          volumeMounts:
+            - name: redis-auth-config
+              mountPath: /etc/redis-auth
+              readOnly: true
+          livenessProbe:
+            tcpSocket: null
+            exec:
+              command:
+                - sh
+                - -c
+                - 'test "$(redis-cli ping)" = PONG'
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+          readinessProbe:
+            tcpSocket: null
+            exec:
+              command:
+                - sh
+                - -c
+                - 'test "$(redis-cli ping)" = PONG'
+            timeoutSeconds: 2
+      volumes:
+        - name: redis-auth-config
+          secret:
+            secretName: redis-auth
+            items:
+              - key: redis.conf
+                path: redis.conf
