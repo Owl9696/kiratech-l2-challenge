@@ -19,7 +19,12 @@ esac
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO_ROOT"
 
-CLUSTER="kiratech-l2"
+export KIND_CLUSTER_NAME="${KIND_CLUSTER_NAME:-kiratech-l2}"
+if [[ ! "$KIND_CLUSTER_NAME" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
+  echo "ERRORE: nome cluster non valido." >&2
+  exit 1
+fi
+CLUSTER="$KIND_CLUSTER_NAME"
 CONTEXT="kind-$CLUSTER"
 NODE_IMAGE="kindest/node:v1.35.8@sha256:07b2536e30b803ed61d1677a79df6115f798ce64c80f9e22f6ed45afd09323c0"
 

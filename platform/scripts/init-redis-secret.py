@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import json
+import os
+import re
 import secrets
 import subprocess
 import sys
@@ -7,9 +9,13 @@ import sys
 if len(sys.argv) != 2 or sys.argv[1] not in ("dev", "prod"):
     sys.exit("Uso: python3 platform/scripts/init-redis-secret.py dev|prod")
 
+cluster = os.environ.get("KIND_CLUSTER_NAME") or "kiratech-l2"
+if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", cluster):
+    sys.exit("ERRORE: nome cluster non valido.")
+
 namespace = "boutique-" + sys.argv[1]
 command = [
-    "kubectl", "--context", "kind-kiratech-l2",
+    "kubectl", "--context", f"kind-{cluster}",
     "-n", namespace,
 ]
 
