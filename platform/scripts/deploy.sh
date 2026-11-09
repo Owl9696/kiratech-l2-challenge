@@ -29,6 +29,9 @@ kubectl --context "$CONTEXT" get nodes
 # Il namespace deve esistere prima della validazione server delle risorse.
 kubectl --context "$CONTEXT" apply -f "$OVERLAY/namespace.yaml"
 
+# Crea il Secret solo se assente, preservando le credenziali esistenti.
+python3 platform/scripts/init-redis-secret.py "$ENVIRONMENT"
+
 echo "Validazione server: $ENVIRONMENT"
 kubectl --context "$CONTEXT" apply --dry-run=server -k "$OVERLAY"
 
