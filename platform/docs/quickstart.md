@@ -162,7 +162,10 @@ La prova di guasto immagine e ripristino è descritta in
 ## Limiti e stato delle verifiche
 
 - Setup verificato sul cluster esistente per entrambi gli ambienti.
-- Creazione completa da zero tramite setup.sh ancora da verificare.
+- Setup verificato anche su un nuovo cluster kind, riutilizzando
+  l'immagine frontend locale e correggendo un limite inotify dell'host.
+  Dettagli: [verifica di ricostruzione](rebuild-verification.md).
+  Non è stata eseguita una prova su un PC completamente vuoto.
 - La CI controlla sintassi shell, rendering dei manifest, test Go del
   frontend e build delle immagini; non esegue il setup su un cluster.
 - Dev e prod sono namespace dello stesso cluster locale a singolo nodo.

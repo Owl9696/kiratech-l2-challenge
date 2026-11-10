@@ -101,11 +101,14 @@ Risultato:
 Verifica:
 - build e test frontend in CI;
 - riutilizzo controllato dell'immagine locale;
-- esecuzione di setup.sh both sul cluster esistente.
+- esecuzione di setup.sh both sul cluster esistente;
+- creazione di un secondo cluster e verifica funzionale dev/prod,
+  dopo la risoluzione di un problema inotify dell'host.
 
 Limite:
-la creazione completa da zero tramite setup.sh non è ancora stata
-verificata al momento della stesura.
+la prova sul nuovo cluster ha riutilizzato l'immagine frontend locale.
+Non equivale a una prova su PC vuoto o a una build senza cache.
+Vedere [verifica di ricostruzione](rebuild-verification.md).
 
 ## Caso operativo: immagine non disponibile
 
@@ -193,7 +196,7 @@ Il candidato mantiene la responsabilità delle modifiche applicate,
 della verifica dei risultati e della spiegazione delle scelte tecniche.
 
 Restano da completare:
-- prova di setup da zero;
+- eventuale verifica aggiuntiva su un host completamente nuovo;
 - revisione finale dei workflow e dei requisiti della challenge;
 - aggiornamento della documentazione in base alle verifiche finali.
 

@@ -189,7 +189,10 @@ in dev, seguita da rollback a una revisione funzionante e verifica HTTP.
 Il dettaglio è disponibile in
 [incident-image-pull.md](incident-image-pull.md).
 
-Il setup è stato eseguito con successo sul cluster esistente.
-La creazione completa da zero tramite setup.sh resta da verificare.
+Il setup è stato eseguito sul cluster esistente e su un nuovo cluster
+kind dedicato. La seconda prova ha riutilizzato l'immagine frontend
+locale e richiesto un intervento sui limiti inotify dell'host.
+Dev e prod hanno superato le verifiche HTTP e i checkout manuali.
+Dettagli e limiti: [verifica di ricostruzione](rebuild-verification.md).
 
 Per i comandi operativi consultare [quickstart.md](quickstart.md).
