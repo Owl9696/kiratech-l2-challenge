@@ -22,6 +22,10 @@ Le integrazioni cloud opzionali non fanno parte del laboratorio.
 
 ## Documentazione
 
+- [Demo tecnica](docs/demo.md): sequenza operativa e punti da spiegare.
+
+- [Aggiornamento e rollback](docs/update-rollback.md): prova v1 → v2 → v1.
+
 - [Ingress locale](ingress/README.md): installazione Traefik, accesso e troubleshooting.
 
 - [Avvio rapido](docs/quickstart.md): prerequisiti, setup e accesso.
