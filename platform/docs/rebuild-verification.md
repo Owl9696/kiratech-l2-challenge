@@ -115,3 +115,16 @@ Questi miglioramenti sono distinti dalle verifiche già completate.
 
 kind, Known Issues, sezione Pod errors due to "too many open files":
 https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files
+
+## Aggiornamento del 10 novembre 2026
+
+deploy.sh verifica ora il rollout di kube-proxy e CoreDNS prima
+di creare namespace, inizializzare Secret e applicare l'applicazione.
+Se uno dei controlli fallisce, lo script termina con un messaggio di errore.
+
+Il percorso con componenti disponibili è stato verificato sul cluster
+kiratech-l2-rebuild, ambiente dev: entrambi i controlli sono riusciti
+e il deploy è terminato con i Deployment invariati.
+
+Non è stato introdotto un nuovo guasto per provare il percorso di errore.
+Questi controlli non sostituiscono le verifiche DNS e HTTP end-to-end.

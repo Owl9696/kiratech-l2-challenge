@@ -31,6 +31,20 @@ OVERLAY="platform/overlays/$ENVIRONMENT"
 echo "Verifica accesso al cluster: $CONTEXT"
 kubectl --context "$CONTEXT" get nodes
 
+# Verifica i componenti di rete del laboratorio kind prima del deploy.
+echo "Verifica kube-proxy e CoreDNS: $CONTEXT"
+if ! kubectl --context "$CONTEXT" -n kube-system \
+  rollout status daemonset/kube-proxy --timeout=180s; then
+  echo "ERRORE: kube-proxy non disponibile. Controllare i log prima di proseguire." >&2
+  exit 1
+fi
+
+if ! kubectl --context "$CONTEXT" -n kube-system \
+  rollout status deployment/coredns --timeout=180s; then
+  echo "ERRORE: CoreDNS non disponibile. Controllare stato e log prima di proseguire." >&2
+  exit 1
+fi
+
 # Il namespace deve esistere prima della validazione server delle risorse.
 kubectl --context "$CONTEXT" apply -f "$OVERLAY/namespace.yaml"
 
