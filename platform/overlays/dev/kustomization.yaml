@@ -19,7 +19,7 @@ replicas:
 images:
   - name: us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo/frontend
     newName: kiratech-frontend
-    newTag: git-197a0f9c572c
+    newTag: git-b13f4246ae3d
 
 patches:
   - path: redis-auth.yaml
