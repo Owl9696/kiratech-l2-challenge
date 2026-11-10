@@ -59,6 +59,8 @@ Pipeline: [Kiratech CI](../.github/workflows/kiratech-ci.yaml).
 ## Verifiche completate
 
 - Test Go e build frontend in CI.
+- Setup automatico dev/prod su cluster kind temporaneo nella CI.
+- Verifica HTTP di homepage, health check e metriche tramite Traefik.
 - Rendering Kustomize e validazione server durante il deploy.
 - Deploy dev/prod e verifiche manuali di carrello, valuta e checkout.
 - Log JSON, probe ed endpoint /metrics.
@@ -77,6 +79,7 @@ non è una prova su PC vuoto né una build senza cache.
 - Immagini frontend caricate localmente in kind.
 - Metriche per processo, senza raccolta centralizzata.
 - Krateo valutato, non installato.
-- La CI non esegue deploy o test end-to-end dell'intero negozio.
+- La CI esegue deploy e controlli HTTP su un cluster temporaneo;
+  non automatizza il percorso completo di carrello e checkout.
 
 Consultare i documenti collegati per procedure e risultati dettagliati.

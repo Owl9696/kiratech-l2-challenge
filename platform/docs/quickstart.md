@@ -60,7 +60,13 @@ Un Secret già presente viene conservato: il setup non ruota le credenziali.
 Questa verifica di esistenza non certifica che un Secret creato manualmente
 contenga tutte le chiavi e i valori corretti.
 
-## Accesso al sito
+## Accesso tramite Ingress
+
+Per installare Traefik e accedere ai due ambienti attraverso gli Ingress,
+seguire la [guida Ingress](../ingress/README.md).
+Il controller richiede un'installazione separata da setup.sh.
+
+## Accesso diretto al sito tramite port-forward
 
 Aprire una finestra terminale dedicata per ogni port-forward e lasciarla aperta.
 
@@ -166,8 +172,10 @@ La prova di guasto immagine e ripristino è descritta in
   l'immagine frontend locale e correggendo un limite inotify dell'host.
   Dettagli: [verifica di ricostruzione](rebuild-verification.md).
   Non è stata eseguita una prova su un PC completamente vuoto.
-- La CI controlla sintassi shell, rendering dei manifest, test Go del
-  frontend e build delle immagini; non esegue il setup su un cluster.
+- La CI controlla sintassi shell, rendering, test Go e build frontend;
+  esegue setup dev/prod su un cluster kind temporaneo, installa Traefik
+  e verifica homepage, health check e metriche attraverso gli Ingress.
+  Il percorso completo di acquisto rimane una verifica manuale.
 - Dev e prod sono namespace dello stesso cluster locale a singolo nodo.
   Il nome prod identifica l'overlay dimostrativo, non un servizio
   configurato per produzione reale.

@@ -29,7 +29,10 @@ prodotto dall'assistente.
 | Documentazione | Bozze delle guide e descrizione dei limiti | Confronto con gli output raccolti |
 
 La CI verifica sintassi shell, rendering degli overlay, test Go e build
-del frontend. Non sostituisce una verifica end-to-end dell'applicazione.
+del frontend. Esegue inoltre setup dev/prod su kind temporaneo,
+installazione di Traefik e controlli HTTP attraverso gli Ingress.
+Questi controlli non sostituiscono la verifica del percorso completo
+di acquisto, eseguita manualmente.
 
 ## Esempi di richieste
 
@@ -201,3 +204,25 @@ Restano da completare:
 - aggiornamento della documentazione in base alle verifiche finali.
 
 L'assistenza AI non sostituisce questi controlli.
+
+## Estensione della CI con deploy automatico
+
+Il 10 novembre 2026 l'assistente ha supportato l'estensione del workflow:
+checkout con cronologia completa, installazione di kind e Helm con verifica
+checksum, setup dev/prod, installazione Traefik, controlli HTTP e pulizia.
+
+Il candidato ha applicato le modifiche e verificato l'esito su GitHub Actions.
+Il run [42829585201](https://github.com/Owl9696/kiratech-l2-challenge/actions/runs/42829585201),
+relativo al commit 4ba85d39, si è concluso con successo in 3 minuti e 13 secondi.
+Sono riusciti deploy, installazione del controller, verifiche HTTP e pulizia.
+Il passo diagnostico è stato saltato perché non si sono verificati errori:
+il suo percorso di esecuzione non è quindi stato verificato da questo run.
+
+Un precedente suggerimento AI per Traefik usava service.type, non accettato
+dal chart 42.3.1. Il rendering Helm ha bloccato l'installazione.
+La lettura dei valori della versione esatta ha permesso di correggere
+il campo in service.spec.type; installazione e accesso sono stati poi verificati.
+
+Il valore dell'assistenza è stato accelerare la preparazione del workflow
+e la diagnosi. La correttezza è stata verificata attraverso gli strumenti
+e gli esiti osservati, senza considerare affidabile il solo suggerimento AI.

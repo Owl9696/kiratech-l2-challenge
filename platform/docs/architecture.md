@@ -117,13 +117,24 @@ può quindi differire da quella contenuta nelle immagini rilasciate.
 | init-redis-secret.py | Creazione del Secret Redis se assente |
 | deploy.sh | Namespace, Secret, validazione server, apply e rollout |
 | setup.sh | Preparazione immagini, cluster e deploy degli ambienti |
-| kiratech-ci.yaml | Sintassi shell, rendering, test Go e build frontend |
+| kiratech-ci.yaml | Validazione, test, build, deploy dev/prod su kind temporaneo e verifiche HTTP tramite Ingress |
 
 La validazione Kustomize verifica la generazione dei manifest.
 La validazione server viene eseguita da deploy.sh contro il cluster.
 
-La CI non effettua il deploy nel cluster locale e non esegue test
-end-to-end dell'intero negozio.
+La CI crea un cluster kind temporaneo sul runner GitHub, esegue
+setup.sh both, installa Traefik e verifica HTTP 200 per homepage,
+/_healthz e /metrics nei due ambienti. Verifica inoltre la presenza
+del contatore frontend_http_requests_total.
+
+I test Go e la build runtime iniziale riguardano il commit corrente.
+Il setup costruisce e distribuisce invece le revisioni frontend
+indicate negli overlay; il checkout include la cronologia Git completa.
+
+In caso di errore sono previsti comandi diagnostici; un passo finale
+con condizione always() richiede la rimozione del cluster temporaneo.
+La CI non accede ai cluster sul PC del candidato e non automatizza
+il percorso completo di acquisto.
 
 ## Sicurezza applicata
 
