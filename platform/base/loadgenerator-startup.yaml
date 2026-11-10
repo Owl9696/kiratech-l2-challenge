@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgenerator
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: frontend-check
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              attempt=1
+              max_attempts=12
+              while [ "$attempt" -le "$max_attempts" ]; do
+                echo "Frontend check: attempt $attempt/$max_attempts"
+                if wget -T 5 -S -O /dev/null "http://${FRONTEND_ADDR}/"; then
+                  echo "Frontend is reachable."
+                  exit 0
+                fi
+                echo "Frontend check failed." >&2
+                if [ "$attempt" -lt "$max_attempts" ]; then
+                  sleep 5
+                fi
+                attempt=$((attempt + 1))
+              done
+              echo "Frontend unavailable after $max_attempts attempts." >&2
+              exit 1

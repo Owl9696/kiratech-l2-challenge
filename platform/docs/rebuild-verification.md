@@ -128,3 +128,20 @@ e il deploy è terminato con i Deployment invariati.
 
 Non è stato introdotto un nuovo guasto per provare il percorso di errore.
 Questi controlli non sostituiscono le verifiche DNS e HTTP end-to-end.
+
+## Correzione del controllo iniziale del loadgenerator
+
+La patch platform/base/loadgenerator-startup.yaml sostituisce il
+confronto numerico sul codice HTTP con il controllo dell'esito di wget.
+Configura un timeout wget di 5 secondi, fino a 12 tentativi,
+con una pausa di 5 secondi fra i tentativi falliti.
+
+Verifica eseguita il 10 novembre 2026 nel dev di kiratech-l2-rebuild:
+- nuovo pod loadgenerator disponibile;
+- init container riuscito al primo tentativo;
+- homepage raggiunta tramite frontend:80 con HTTP 200;
+- messaggio finale: Frontend is reachable.
+
+È stato verificato il percorso di successo.
+Non è stato simulato un nuovo guasto per verificare l'esaurimento
+dei tentativi della patch.
