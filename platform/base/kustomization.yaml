@@ -6,3 +6,4 @@ resources:
 patches:
   - path: frontend-security.yaml
   - path: loadgenerator-startup.yaml
+  - path: loadgenerator-config.yaml

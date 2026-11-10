@@ -3,6 +3,23 @@
 Laboratorio Kubernetes locale basato su Online Boutique.
 Autore: Francesco De Gese.
 
+## Scelta dell'applicazione
+
+Il progetto originale è [Google Cloud Online Boutique](https://github.com/GoogleCloudPlatform/microservices-demo).
+È un negozio dimostrativo con catalogo, carrello e checkout:
+pagamenti e spedizioni sono simulati.
+
+La scelta permette di esercitare deploy, comunicazioni HTTP/gRPC,
+dipendenze tra servizi, gestione di Redis e troubleshooting.
+La disponibilità di codice, Dockerfile e manifest upstream consente
+di concentrarsi sull'esercizio della piattaforma e su modifiche mirate.
+
+La challenge utilizza i servizi applicativi e Redis del progetto.
+Il loadgenerator è attivo in dev e disattivato in prod.
+Il frontend è personalizzato e costruito localmente; gli altri servizi
+utilizzano le immagini upstream indicate nei manifest.
+Le integrazioni cloud opzionali non fanno parte del laboratorio.
+
 ## Documentazione
 
 - [Avvio rapido](docs/quickstart.md): prerequisiti, setup e accesso.

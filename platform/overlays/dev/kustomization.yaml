@@ -23,3 +23,9 @@ images:
 patches:
   - path: redis-auth.yaml
   - path: cartservice-redis-auth.yaml
+
+configMapGenerator:
+  - name: loadgenerator-config
+    literals:
+      - USERS=10
+      - RATE=1

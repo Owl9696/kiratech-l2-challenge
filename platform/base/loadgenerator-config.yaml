@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgenerator
+spec:
+  template:
+    spec:
+      containers:
+        - name: main
+          env:
+            - name: USERS
+              value: null
+              valueFrom:
+                configMapKeyRef:
+                  name: loadgenerator-config
+                  key: USERS
+            - name: RATE
+              value: null
+              valueFrom:
+                configMapKeyRef:
+                  name: loadgenerator-config
+                  key: RATE
