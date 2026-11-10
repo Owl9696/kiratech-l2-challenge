@@ -24,13 +24,16 @@ jobs:
   validate-test-build:
     name: Validate, test and build
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 40
+    env:
+      KIND_CLUSTER_NAME: kiratech-ci
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Check shell syntax
         run: |
@@ -70,3 +73,120 @@ jobs:
 
       - name: Build frontend runtime image
         run: ./platform/scripts/build-frontend.sh
+
+      - name: Install kind and Helm
+        env:
+          KIND_VERSION: v0.33.0
+          HELM_VERSION: v3.20.0
+        run: |
+          download_dir="$(mktemp -d)"
+          trap 'rm -rf "$download_dir"' EXIT
+          cd "$download_dir"
+
+          kind_url="https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}"
+          curl -fsSL --retry 3 -o kind-linux-amd64 "$kind_url/kind-linux-amd64"
+          curl -fsSL --retry 3 -o kind-linux-amd64.sha256sum "$kind_url/kind-linux-amd64.sha256sum"
+          sha256sum --check kind-linux-amd64.sha256sum
+          sudo install -m 0755 kind-linux-amd64 /usr/local/bin/kind
+
+          archive="helm-${HELM_VERSION}-linux-amd64.tar.gz"
+          curl -fsSL --retry 3 -o "$archive" "https://get.helm.sh/$archive"
+          curl -fsSL --retry 3 -o "$archive.sha256sum" "https://get.helm.sh/$archive.sha256sum"
+          sha256sum --check "$archive.sha256sum"
+          tar -xzf "$archive"
+          sudo install -m 0755 linux-amd64/helm /usr/local/bin/helm
+
+          kind version
+          helm version --short
+
+      - name: Prepare runner inotify limits
+        run: |
+          watches="$(sysctl -n fs.inotify.max_user_watches)"
+          instances="$(sysctl -n fs.inotify.max_user_instances)"
+          sudo sysctl -w \
+            fs.inotify.max_user_watches="$(( watches < 524288 ? 524288 : watches ))" \
+            fs.inotify.max_user_instances="$(( instances < 512 ? 512 : instances ))"
+
+      - name: Deploy dev and prod to temporary kind cluster
+        run: ./platform/scripts/setup.sh both
+
+      - name: Install Traefik ingress controller
+        run: |
+          helm repo add traefik https://traefik.github.io/charts
+          helm repo update traefik
+          helm upgrade --install traefik traefik/traefik \
+            --version "$(cat platform/ingress/chart-version.txt)" \
+            --kube-context "kind-$KIND_CLUSTER_NAME" \
+            --namespace ingress-system \
+            --create-namespace \
+            --values platform/ingress/traefik-values.yaml \
+            --skip-crds \
+            --wait --timeout 5m
+
+      - name: Verify dev and prod through ingress
+        run: |
+          work_dir="$(mktemp -d)"
+          kubectl --context "kind-$KIND_CLUSTER_NAME" \
+            -n ingress-system port-forward service/traefik 8085:80 \
+            > "$work_dir/port-forward.log" 2>&1 &
+          forward_pid=$!
+          trap 'kill "$forward_pid" 2>/dev/null || true; rm -rf "$work_dir"' EXIT
+
+          for environment in dev prod; do
+            host="boutique-${environment}.localhost"
+            for path in / /_healthz /metrics; do
+              success=false
+              for attempt in $(seq 1 20); do
+                if ! kill -0 "$forward_pid" 2>/dev/null; then
+                  cat "$work_dir/port-forward.log"
+                  exit 1
+                fi
+                if code="$(curl --silent --show-error --max-time 10 \
+                  --noproxy '*' \
+                  --resolve "$host:8085:127.0.0.1" \
+                  -o "$work_dir/response" -w '%{http_code}' \
+                  "http://$host:8085$path")"; then
+                  if [[ "$code" == 200 ]]; then
+                    success=true
+                    break
+                  fi
+                fi
+                sleep 2
+              done
+
+              if [[ "$success" != true ]]; then
+                echo "ERROR: $environment $path did not return HTTP 200."
+                cat "$work_dir/port-forward.log"
+                exit 1
+              fi
+
+              if [[ "$path" == /metrics ]]; then
+                grep -Eq '^frontend_http_requests_total [0-9]+$' \
+                  "$work_dir/response"
+              fi
+              echo "OK: $environment $path HTTP 200"
+            done
+          done
+
+      - name: Diagnose failed deployment
+        if: failure()
+        run: |
+          context="kind-$KIND_CLUSTER_NAME"
+          kubectl --context "$context" --request-timeout=10s \
+            get nodes -o wide || true
+          kubectl --context "$context" --request-timeout=10s \
+            get pods,deployments,services,ingresses -A -o wide || true
+          kubectl --context "$context" --request-timeout=10s \
+            get events -A --field-selector type=Warning \
+            --sort-by=.metadata.creationTimestamp || true
+          kubectl --context "$context" --request-timeout=10s \
+            -n ingress-system logs deployment/traefik --tail=80 || true
+          kubectl --context "$context" --request-timeout=10s \
+            -n kube-system logs daemonset/kube-proxy --tail=80 || true
+
+      - name: Delete temporary kind cluster
+        if: always()
+        run: |
+          if command -v kind >/dev/null 2>&1; then
+            kind delete cluster --name "$KIND_CLUSTER_NAME"
+          fi
