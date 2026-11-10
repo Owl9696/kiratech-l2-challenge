@@ -4,6 +4,7 @@ namespace: boutique-dev
 resources:
   - ../../base
   - namespace.yaml
+  - ingress.yaml
 labels:
   - pairs:
       environment: dev

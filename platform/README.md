@@ -22,6 +22,8 @@ Le integrazioni cloud opzionali non fanno parte del laboratorio.
 
 ## Documentazione
 
+- [Ingress locale](ingress/README.md): installazione Traefik, accesso e troubleshooting.
+
 - [Avvio rapido](docs/quickstart.md): prerequisiti, setup e accesso.
 - [Architettura](docs/architecture.md): componenti, scelte e limiti.
 - [Incidente immagine](docs/incident-image-pull.md): guasto e rollback.

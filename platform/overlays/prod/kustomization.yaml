@@ -4,6 +4,7 @@ namespace: boutique-prod
 resources:
   - ../../base
   - namespace.yaml
+  - ingress.yaml
 labels:
   - pairs:
       environment: prod
