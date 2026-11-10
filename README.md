@@ -1,3 +1,32 @@
+<!-- kiratech-challenge-entry -->
+# Kiratech L2 Challenge — Francesco De Gese
+
+Laboratorio basato su Online Boutique, eseguito su Kubernetes locale
+con kind e configurazioni Kustomize per dev e prod.
+
+**Inizia da qui: [documentazione della challenge](platform/README.md).**
+
+- [Avvio e prerequisiti](platform/docs/quickstart.md)
+- [Architettura e scelte tecniche](platform/docs/architecture.md)
+- [Guasto immagine e rollback](platform/docs/incident-image-pull.md)
+- [Ricostruzione e troubleshooting di rete](platform/docs/rebuild-verification.md)
+- [Valutazione Krateo](platform/docs/krateo-assessment.md)
+- [Utilizzo dell'AI](platform/docs/ai-usage.md)
+
+[![Kiratech CI](https://github.com/Owl9696/kiratech-l2-challenge/actions/workflows/kiratech-ci.yaml/badge.svg?branch=challenge%2Fplatform)](https://github.com/Owl9696/kiratech-l2-challenge/actions/workflows/kiratech-ci.yaml)
+
+Sono stati verificati deploy, percorso di acquisto e metriche in dev/prod,
+oltre a rollback e ricostruzione su un secondo cluster.
+Limiti e condizioni delle prove sono descritti nei documenti.
+
+## Documentazione originale Online Boutique
+
+La sezione seguente appartiene al progetto upstream. Le istruzioni GKE
+e il relativo badge CI si riferiscono al progetto originale.
+Per eseguire questa challenge seguire la guida locale collegata sopra.
+
+---
+
 <!-- <p align="center">
 <img src="/src/frontend/static/icons/Hipster_HeroLogoMaroon.svg" width="300" alt="Online Boutique" />
 </p> -->
