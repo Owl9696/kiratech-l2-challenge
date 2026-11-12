@@ -22,6 +22,8 @@ Le integrazioni cloud opzionali non fanno parte del laboratorio.
 
 ## Documentazione
 
+- [Mappa del progetto](docs/project-map.md): componenti, flussi, CI e limiti.
+
 - [Demo tecnica](docs/demo.md): sequenza operativa e punti da spiegare.
 
 - [Aggiornamento e rollback](docs/update-rollback.md): prova v1 → v2 → v1.
